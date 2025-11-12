@@ -1,0 +1,169 @@
+rules:
+  # Services
+  - check_name: "Service: telnet"
+    severity: "HIGH"
+    remediation: "Disable telnet service: sudo systemctl disable telnet && sudo systemctl stop telnet"
+  
+  - check_name: "Service: rsh"
+    severity: "HIGH"
+    remediation: "Disable rsh service: sudo systemctl disable rsh && sudo systemctl stop rsh"
+  
+  - check_name: "Service: rlogin"
+    severity: "HIGH"
+    remediation: "Disable rlogin service: sudo systemctl disable rlogin && sudo systemctl stop rlogin"
+  
+  - check_name: "Service: rexec"
+    severity: "HIGH"
+    remediation: "Disable rexec service: sudo systemctl disable rexec && sudo systemctl stop rexec"
+  
+  - check_name: "Service: xinetd"
+    severity: "MEDIUM"
+    remediation: "Disable xinetd if not needed: sudo systemctl disable xinetd && sudo systemctl stop xinetd"
+  
+  - check_name: "Service: tftp"
+    severity: "MEDIUM"
+    remediation: "Disable tftp service if not needed: sudo systemctl disable tftp && sudo systemctl stop tftp"
+  
+  - check_name: "Failed Services"
+    severity: "MEDIUM"
+    remediation: "Investigate failed services: sudo systemctl --failed"
+  
+  # Network and Firewall
+  - check_name: "UFW Firewall"
+    severity: "HIGH"
+    remediation: "Enable UFW firewall: sudo ufw enable"
+  
+  - check_name: "Firewalld"
+    severity: "HIGH"
+    remediation: "Enable firewalld: sudo systemctl enable firewalld && sudo systemctl start firewalld"
+  
+  - check_name: "IP Forwarding"
+    severity: "MEDIUM"
+    remediation: "Disable IP forwarding: sudo sysctl -w net.ipv4.ip_forward=0 && echo 'net.ipv4.ip_forward=0' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "ICMP Redirects"
+    severity: "MEDIUM"
+    remediation: "Disable ICMP redirects: sudo sysctl -w net.ipv4.conf.all.accept_redirects=0 && echo 'net.ipv4.conf.all.accept_redirects=0' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "Source Routing"
+    severity: "MEDIUM"
+    remediation: "Disable source routing: sudo sysctl -w net.ipv4.conf.all.accept_source_route=0 && echo 'net.ipv4.conf.all.accept_source_route=0' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "SYN Cookies"
+    severity: "MEDIUM"
+    remediation: "Enable SYN cookies: sudo sysctl -w net.ipv4.tcp_syncookies=1 && echo 'net.ipv4.tcp_syncookies=1' | sudo tee -a /etc/sysctl.conf"
+  
+  # SSH
+  - check_name: "SSH PermitRootLogin"
+    severity: "HIGH"
+    remediation: "Disable root login: Edit /etc/ssh/sshd_config and set PermitRootLogin no, then restart SSH: sudo systemctl restart sshd"
+  
+  - check_name: "SSH PasswordAuthentication"
+    severity: "MEDIUM"
+    remediation: "Consider disabling password authentication and using key-based auth: Edit /etc/ssh/sshd_config and set PasswordAuthentication no"
+  
+  - check_name: "SSH X11Forwarding"
+    severity: "MEDIUM"
+    remediation: "Disable X11 forwarding if not needed: Edit /etc/ssh/sshd_config and set X11Forwarding no"
+  
+  - check_name: "SSH PermitEmptyPasswords"
+    severity: "HIGH"
+    remediation: "Disable empty passwords: Edit /etc/ssh/sshd_config and set PermitEmptyPasswords no"
+  
+  - check_name: "SSH Config Permissions"
+    severity: "MEDIUM"
+    remediation: "Set secure permissions: sudo chmod 600 /etc/ssh/sshd_config"
+  
+  # Users
+  - check_name: "UID 0 Users"
+    severity: "HIGH"
+    remediation: "Remove or change UID of users with UID 0 (except root): sudo usermod -u <new_uid> <username>"
+  
+  - check_name: "Empty Password Accounts"
+    severity: "HIGH"
+    remediation: "Set passwords for all accounts: sudo passwd <username>"
+  
+  - check_name: "Sudoers File Permissions"
+    severity: "HIGH"
+    remediation: "Set correct permissions: sudo chmod 440 /etc/sudoers"
+  
+  - check_name: "/etc/shadow Permissions"
+    severity: "HIGH"
+    remediation: "Set secure permissions: sudo chmod 640 /etc/shadow"
+  
+  - check_name: "Password Expiration"
+    severity: "MEDIUM"
+    remediation: "Set password expiration: sudo chage -M 90 <username>"
+  
+  # Permissions
+  - check_name: "World-Writable Files"
+    severity: "HIGH"
+    remediation: "Review and remove world-writable permissions: sudo chmod o-w <file>"
+  
+  - check_name: "World-Writable Directories"
+    severity: "MEDIUM"
+    remediation: "Review and remove world-writable permissions: sudo chmod o-w <directory>"
+  
+  - check_name: "/tmp Permissions"
+    severity: "MEDIUM"
+    remediation: "Set correct permissions: sudo chmod 1777 /tmp"
+  
+  - check_name: "/var/tmp Permissions"
+    severity: "MEDIUM"
+    remediation: "Set correct permissions: sudo chmod 1777 /var/tmp"
+  
+  - check_name: "Root-Owned Writable Files"
+    severity: "HIGH"
+    remediation: "Review and fix permissions on root-owned files in system directories"
+  
+  # Kernel
+  - check_name: "ASLR"
+    severity: "HIGH"
+    remediation: "Enable ASLR: sudo sysctl -w kernel.randomize_va_space=2 && echo 'kernel.randomize_va_space=2' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "Dmesg Restrict"
+    severity: "MEDIUM"
+    remediation: "Restrict dmesg: sudo sysctl -w kernel.dmesg_restrict=1 && echo 'kernel.dmesg_restrict=1' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "Kptr Restrict"
+    severity: "MEDIUM"
+    remediation: "Restrict kernel pointers: sudo sysctl -w kernel.kptr_restrict=2 && echo 'kernel.kptr_restrict=2' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "Ptrace Scope"
+    severity: "MEDIUM"
+    remediation: "Restrict ptrace: sudo sysctl -w kernel.yama.ptrace_scope=1 && echo 'kernel.yama.ptrace_scope=1' | sudo tee -a /etc/sysctl.conf"
+  
+  - check_name: "SUID Core Dumps"
+    severity: "MEDIUM"
+    remediation: "Disable SUID core dumps: sudo sysctl -w fs.suid_dumpable=0 && echo 'fs.suid_dumpable=0' | sudo tee -a /etc/sysctl.conf"
+  
+  # Security Frameworks
+  - check_name: "SELinux Status"
+    severity: "HIGH"
+    remediation: "Enable SELinux in enforcing mode: Edit /etc/selinux/config and set SELINUX=enforcing, then reboot"
+  
+  - check_name: "AppArmor Status"
+    severity: "HIGH"
+    remediation: "Enable AppArmor: sudo systemctl enable apparmor && sudo systemctl start apparmor"
+  
+  - check_name: "Auditd Status"
+    severity: "HIGH"
+    remediation: "Enable auditd: sudo systemctl enable auditd && sudo systemctl start auditd"
+  
+  - check_name: "Audit Filesystem Rules"
+    severity: "MEDIUM"
+    remediation: "Add filesystem audit rules: sudo auditctl -w /etc/passwd -p wa -k passwd_changes"
+  
+  - check_name: "Audit System Call Rules"
+    severity: "MEDIUM"
+    remediation: "Add system call audit rules for critical operations"
+  
+  - check_name: "/etc/crontab Permissions"
+    severity: "MEDIUM"
+    remediation: "Set secure permissions: sudo chmod 644 /etc/crontab"
+  
+  # Default rules for INFO/PASS results
+  - check_name: ".*"
+    severity: "LOW"
+    remediation: "No action required"
+
